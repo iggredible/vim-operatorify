@@ -1,0 +1,144 @@
+*operatorify.txt*  Helper utility to create Vim operators
+*operatorify*
+
+Author:  Igor Irianto <https://irian.to>
+License: The same as Vim's |license|.
+                                                       *operatorify-intro*
+Operatorify is a Vim plugin that helps turning normal functions into Vim 
+operators with minimal effort. It provides utilities to create operators that 
+work with motions and visual selections, handle the dot command correctly, and 
+manage multiple operators through a popup list.
+
+==============================================================================
+CONTENTS                                               *operatorify-contents*
+
+    1. Usage .......................... |operatorify-usage|
+    2. Functions ...................... |operatorify-functions|
+    3. Configuration .................. |operatorify-config|
+    4. Examples ...................... |operatorify-examples|
+
+==============================================================================
+1. Usage                                                *operatorify-usage*
+
+Operatorify turns functions that accept a string as their first argument into 
+Vim operators. These operators can then be used with motions, in visual mode, 
+and support the dot command.
+
+The basic requirement for a function to work with operatorify is that it must 
+accept a string as its first argument. This string will contain the text that 
+the operator will work on.
+
+Example function: >
+    function! MyFunction(text)
+        " Do something with text
+        echo "Processing: " .. a:text
+    endfunction
+
+
+==============================================================================
+2. Functions                                           *operatorify-functions*
+
+                                                      *operatorify#wrapper()*
+operatorify#wrapper({funcname}[, {context}[, {type}]])
+    The core function that turns a function into an operator. The function 
+    specified by {funcname} must accept a string as its first argument.
+
+    Basic usage: >
+        nnoremap <expr> <Plug>MyFunction operatorify#wrapper('MyFunction')
+        xnoremap <expr> <Plug>MyFunction operatorify#wrapper('MyFunction')
+        nnoremap <expr> <Plug>MyFunctionLine operatorify#wrapper('MyFunction') .. '_'
+
+                                                      *operatorify#mapper()*
+operatorify#mapper({key}, {funcname})
+    A helper function to quickly create operator mappings. It follows the 
+    convention where the line operation is triggered by repeating the last 
+    character of the key.
+
+    Arguments:
+        {key}       The key sequence for the operator
+        {funcname}  Name of the function to be turned into an operator
+
+    Example: >
+        call operatorify#mapper('go', 'MyFunction')
+
+    This creates the following mappings:
+        go   -> operator (works with motions)
+        goo  -> operate on current line
+        go   -> operate on visual selection (in visual mode)
+
+                                                      *operatorify#lister()*
+operatorify#lister([{text}])
+    Creates a popup menu from a list of functions defined in |g:operatorify_list|.
+    When an item is selected, the corresponding function is called with the 
+    {text} argument.
+
+==============================================================================
+3. Configuration                                       *operatorify-config*
+
+                                                      *g:operatorify_list*
+g:operatorify_list
+    List of function names to be displayed in the popup menu created by 
+    |operatorify#lister()|.
+    Default: [] >
+        let g:operatorify_list = ['MyFunction', 'AnotherFunction']
+
+                                                      *g:operatorify_list_options*
+g:operatorify_list_options
+    Dictionary of options for the popup menu. See |popup_menu-arguments| for 
+    available options.
+    Default: >
+        let g:operatorify_list_options = {
+            \ 'callback': 'PopupCallback',
+            \ 'border': [0,0,0,0],
+            \ 'padding': [0,1,0,0],
+            \ 'pos': 'topleft',
+            \ 'moved': [0, 0, 0],
+            \ 'scrollbar': 1,
+            \ 'maxheight': 5,
+            \ 'fixed': 1,
+            \ 'highlight': 'Normal',
+            \ 'minwidth': 25
+            \ }
+
+
+==============================================================================
+4. Examples                                           *operatorify-examples*
+
+Basic operator creation: >
+    " Define a function
+    function! ToUpper(text)
+        return toupper(a:text)
+    endfunction
+
+    " Create mappings manually
+    nnoremap <expr> <Plug>ToUpper operatorify#wrapper('ToUpper')
+    xnoremap <expr> <Plug>ToUpper operatorify#wrapper('ToUpper')
+    nnoremap <expr> <Plug>ToUpperLine operatorify#wrapper('ToUpper') .. '_'
+
+    " Map to keys
+    nmap go  <Plug>ToUpper
+    xmap go  <Plug>ToUpper
+    nmap goo <Plug>ToUpperLine
+
+    " Or use the mapper helper
+    call operatorify#mapper('go', 'ToUpper')
+
+
+Using the lister with multiple functions: >
+    " Define functions
+    function! ToUpper(text)
+        return toupper(a:text)
+    endfunction
+
+    function! ToLower(text)
+        return tolower(a:text)
+    endfunction
+
+    " Set up the list
+    let g:operatorify_list = ['ToUpper', 'ToLower']
+
+    " Map the lister to a key
+    nnoremap <leader>o :call operatorify#lister()<CR>
+
+
+ vim:tw=78:ts=8:ft=help:norl:
