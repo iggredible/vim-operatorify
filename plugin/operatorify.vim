@@ -68,7 +68,7 @@ function! OpWrapper(f = 'test_null_function', context = {}, type = '') abort
   endtry
 endfunction
 
-function! OpMapper(key, funcname, wrapper = 'OpMapper') abort
+function! OpMapper(key, funcname, wrapper = 'OpWrapper') abort
     let l:plug = '<Plug>' . a:funcname
     let l:expr = a:wrapper . '("' . a:funcname . '")'
     let l:last_char = a:key[strlen(a:key)-1]
