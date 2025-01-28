@@ -1,14 +1,13 @@
 # vim-operatorify
 
-A powerful utility that turns Vim functions into operators with minimal effort.
+Turn Vim functions into operators easily. So OP.
 
-## Features
+## What it does
 
-- Turn any function that accepts text into a Vim operator
+- Turn any function into a Vim operator (note: the function will receive a text 1st argument)
 - Automatically handles dot-repeat
-- Works with motions and visual selections
-- Provides utilities for quick operator mapping
-- Optional popup menu to manage multiple operators
+- Helper for a quick operator mapping
+- Want to map multiple functions into an operator? No problem. Use a popup menu helper to manage multiple operators
 
 ## Usage
 
@@ -25,35 +24,34 @@ endfunction
 
 ### Creating Operators
 
-#### Manual Method
-
-```vim
-" Create mappings
-nnoremap <expr> <Plug>MyFunction operatorify#wrapper('MyFunction')
-xnoremap <expr> <Plug>MyFunction operatorify#wrapper('MyFunction')
-nnoremap <expr> <Plug>MyFunctionLine operatorify#wrapper('MyFunction') .. '_'
-
-" Map to keys
-nmap go  <Plug>MyFunction
-xmap go  <Plug>MyFunction
-nmap goo <Plug>MyFunctionLine
-```
-
 #### Using the Mapper Helper
 
 ```vim
-" Does the same as above in one line
-call operatorify#mapper('go', 'MyFunction')
+call Operatorify#Mapper('go', 'MyFunction')
 ```
 
-The mapper follows the convention that repeating the last character of the key creates a line operator. For example:
+The mapper follows the convention that repeating the last character of the key creates a line operator.
 - `go` operates on a motion
 - `goo` operates on the current line
 - `go` in visual mode operates on the selection
 
+#### Manually
+
+If you want to create your own set of mapping:
+
+```vim
+" Create mappings
+nnoremap <expr> <Plug>MyFunction Operatorify#Wrapper('MyFunction')
+nnoremap <expr> <Plug>MyFunctionLine Operatorify#Wrapper('MyFunction') .. '_'
+
+" Map to keys
+nmap go  <Plug>MyFunction
+nmap goo <Plug>MyFunctionLine
+```
+
 ### Using the Popup List
 
-You can manage multiple operators through a popup menu:
+You can manage multiple operators through a popup menu. By default, this is mapped to `gl`:
 
 ```vim
 " Define your functions
@@ -68,8 +66,13 @@ endfunction
 " Set up the list
 let g:operatorify_list = ['ToUpper', 'ToLower']
 
-" Map the lister to a key
-nnoremap <leader>o :call operatorify#lister()<CR>
+" Default mapping is gl, but you can change it:
+nnoremap <leader>o :call OpLister()<CR>
+```
+
+To disable the default mapping, add this to your vimrc:
+```vim
+let g:operatorify_no_mappings = 1
 ```
 
 ## Configuration
@@ -79,7 +82,7 @@ nnoremap <leader>o :call operatorify#lister()<CR>
 You can customize the appearance and behavior of the popup menu:
 
 ```vim
-let g:operatorify_list_options = {
+let g:operatorify_lister_options = {
     \ 'callback': 'PopupCallback',
     \ 'border': [0,0,0,0],
     \ 'padding': [0,1,0,0],
@@ -101,6 +104,12 @@ let g:operatorify_list_options = {
 Plug 'iggredible/vim-operatorify'
 ```
 
+### Using packer.nvim
+
+```lua
+use 'iggredible/vim-operatorify'
+```
+
 ### Using pathogen
 
 ```bash
@@ -108,13 +117,9 @@ cd ~/.vim/bundle
 git clone https://github.com/iggredible/vim-operatorify.git
 ```
 
-### Manual Installation
-
-Copy the contents of each directory in the plugin into the corresponding directories in your `~/.vim` directory.
 
 ## Documentation
 
-Detailed documentation is available in Vim:
 ```vim
 :help operatorify
 ```
@@ -128,9 +133,8 @@ function! ToggleCase(text)
     return a:text =~# '\u' ? tolower(a:text) : toupper(a:text)
 endfunction
 
-call operatorify#mapper('gt', 'ToggleCase')
+call Operatorify#Mapper('gt', 'ToggleCase')
 
-" Now you can use:
 " gt{motion} - toggle case of motion
 " gtt        - toggle case of current line
 " gt         - toggle case of visual selection
@@ -148,13 +152,9 @@ let g:operatorify_list = [
     \ 'SnakeCase'
     \ ]
 
-" Map popup trigger
-nnoremap <leader>o :call operatorify#lister()<CR>
+" Use default gl mapping 
+call Operatorify#Mapper('gl', 'Operatorify#Lister')
 ```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
