@@ -49,32 +49,6 @@ nmap go  <Plug>MyFunction
 nmap goo <Plug>MyFunctionLine
 ```
 
-### Using the Popup List
-
-You can manage multiple operators through a popup menu. By default, this is mapped to `gl`:
-
-```vim
-" Define your functions
-function! ToUpper(text)
-    return toupper(a:text)
-endfunction
-
-function! ToLower(text)
-    return tolower(a:text)
-endfunction
-
-" Set up the list
-let g:operatorify_list = ['ToUpper', 'ToLower']
-
-" Default mapping is gl, but you can change it:
-nnoremap <leader>o :call OpLister()<CR>
-```
-
-To disable the default mapping, add this to your vimrc:
-```vim
-let g:operatorify_no_mappings = 1
-```
-
 ## Configuration
 
 ### Popup List Options
@@ -96,6 +70,33 @@ let g:operatorify_lister_options = {
     \ }
 ```
 
+### Using And Managing the Popup List Items
+
+You can manage multiple operators through a popup menu. By default, this is mapped to `gl`:
+
+```vim
+" Define your functions
+function! ToUpper(text)
+    return toupper(a:text)
+endfunction
+
+function! ToLower(text)
+    return tolower(a:text)
+endfunction
+
+" Set up the list
+let g:operatorify_list = ['ToUpper', 'ToLower']
+
+" Default mapping is gl, but you can change it
+" You can run it as a command too
+nnoremap <leader>o :call Operatorify#Lister()<CR>
+```
+
+To disable the default mapping, add this to your vimrc:
+```vim
+let g:operatorify_no_mappings = 1
+```
+
 ## Installation
 
 ### Using vim-plug
@@ -104,19 +105,9 @@ let g:operatorify_lister_options = {
 Plug 'iggredible/vim-operatorify'
 ```
 
-### Using packer.nvim
+Source the file, then run `:PlugInstall`.
 
-```lua
-use 'iggredible/vim-operatorify'
-```
-
-### Using pathogen
-
-```bash
-cd ~/.vim/bundle
-git clone https://github.com/iggredible/vim-operatorify.git
-```
-
+Should work with other plugin managers.
 
 ## Documentation
 
@@ -152,8 +143,8 @@ let g:operatorify_list = [
     \ 'SnakeCase'
     \ ]
 
-" Use default gl mapping 
-call Operatorify#Mapper('gl', 'Operatorify#Lister')
+" Map to gz
+call Operatorify#Mapper('gz', 'Operatorify#Lister')
 ```
 
 ## License
