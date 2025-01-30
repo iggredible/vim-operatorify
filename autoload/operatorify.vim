@@ -89,28 +89,28 @@ function! Operatorify#Lister(text = '')
     endif
   endfunction
 
-  let cur_line = line('.')
-  let win_height = winheight(0)
-  let space_below = win_height - cur_line
-  let needed_height = len(l:list)
   let cursor_pos = screenpos(win_getid(), line('.'), col('.'))
+  let screen_row = cursor_pos.row
   let screen_col = cursor_pos.col
+  let total_height = &lines
+  let space_below = total_height - screen_row
+  let needed_height = len(l:list)
 
   let options = get(g:, 'operatorify_options', {
-                \ 'callback': 'PopupCallback',
-                \ 'border': [],
-                \ 'padding': [0,1,0,1],
-                \ 'pos': 'topleft',
-                \ 'moved': [0, 0, 0],
-                \ 'scrollbar': 0,
-                \ 'fixed': 1
-                \ })
+        \ 'callback': 'PopupCallback',
+        \ 'border': [],
+        \ 'padding': [0,1,0,1],
+        \ 'pos': 'topleft',
+        \ 'moved': [0, 0, 0],
+        \ 'scrollbar': 0,
+        \ 'fixed': 1
+        \ })
 
   if space_below < needed_height
     let options.line = cursor_pos.row - needed_height
     let options.pos = 'botleft'
   else
-    let options.line = cur_line + 1
+    let options.line = screen_row + 1
   endif
 
   let options.col = screen_col
