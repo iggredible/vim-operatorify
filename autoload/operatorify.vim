@@ -107,7 +107,7 @@ function! Operatorify#Lister(text = '')
                 \ })
 
   if space_below < needed_height
-    let options.line = cur_line - needed_height
+    let options.line = cursor_pos.row - needed_height
     let options.pos = 'botleft'
   else
     let options.line = cur_line + 1
