@@ -63,56 +63,56 @@ function! Operatorify#Wrapper(f = 'test_null_function', context = {}, type = '')
 endfunction
 
 function! Operatorify#Mapper(key, funcname, wrapper = 'Operatorify#Wrapper') abort
-    let l:plug = '<Plug>' . a:funcname
-    let l:expr = a:wrapper . '("' . a:funcname . '")'
-    let l:last_char = a:key[strlen(a:key)-1]
+  let l:plug = '<Plug>' . a:funcname
+  let l:expr = a:wrapper . '("' . a:funcname . '")'
+  let l:last_char = a:key[strlen(a:key)-1]
 
-    execute 'nnoremap <expr> ' . l:plug . ' ' . l:expr
-    execute 'xnoremap <expr> ' . l:plug . ' ' . l:expr
-    execute 'nnoremap <expr> ' . l:plug . 'Line ' . l:expr . ' .. "_"'
+  execute 'nnoremap <expr> ' . l:plug . ' ' . l:expr
+  execute 'xnoremap <expr> ' . l:plug . ' ' . l:expr
+  execute 'nnoremap <expr> ' . l:plug . 'Line ' . l:expr . ' .. "_"'
 
-    " If key is 'gs', then line operator is gss
-    " If key is 'go', then line operator is goo
-    " If key is 'z', then line operator is zz
-    execute 'nnoremap ' . a:key . ' ' . l:plug
-    execute 'xnoremap ' . a:key . ' ' . l:plug
-    execute 'nnoremap ' . a:key . l:last_char . ' ' . l:plug . 'Line'
+  " If key is 'gs', then line operator is gss
+  " If key is 'go', then line operator is goo
+  " If key is 'z', then line operator is zz
+  execute 'nnoremap ' . a:key . ' ' . l:plug
+  execute 'xnoremap ' . a:key . ' ' . l:plug
+  execute 'nnoremap ' . a:key . l:last_char . ' ' . l:plug . 'Line'
 endfunction
 
 function! Operatorify#Lister(text = '')
-    let l:list = get(g:, 'operatorify_list', [])
+  let l:list = get(g:, 'operatorify_list', [])
 
-    function! PopupCallback(id, result) closure
-        if a:result != -1
-          let funcname = l:list[a:result-1]
-          execute 'call ' .. funcname .. '(' .. string(a:text) .. ')'
-        endif
-    endfunction
-
-    let cur_line = line('.')
-    let cur_col = virtcol('.') + 4
-    let win_height = winheight(0)
-    let space_below = win_height - cur_line
-    let needed_height = len(l:list)
-
-    let options = get(g:, 'operatorify_options', {
-          \ 'callback': 'PopupCallback',
-          \ 'border': [],
-          \ 'padding': [0,1,0,1],
-          \ 'pos': 'topleft',
-          \ 'col': cur_col,
-          \ 'moved': [0, 0, 0],
-          \ 'scrollbar': 0,
-          \ 'fixed': 1
-          \ })
-
-    if space_below < needed_height
-        let options.line = cur_line - needed_height
-        let options.pos = 'botleft'
-    else
-        let options.line = cur_line + 1
+  function! PopupCallback(id, result) closure
+    if a:result != -1
+      let funcname = l:list[a:result-1]
+      execute 'call ' .. funcname .. '(' .. string(a:text) .. ')'
     endif
+  endfunction
 
-    let winid = popup_menu(l:list, options)
+  let cur_line = line('.')
+  let win_height = winheight(0)
+  let space_below = win_height - cur_line
+  let needed_height = len(l:list)
+  let cursor_pos = screenpos(win_getid(), line('.'), col('.'))
+  let screen_col = cursor_pos.col
+
+  let options = get(g:, 'operatorify_options', {
+                \ 'callback': 'PopupCallback',
+                \ 'border': [],
+                \ 'padding': [0,1,0,1],
+                \ 'pos': 'topleft',
+                \ 'moved': [0, 0, 0],
+                \ 'scrollbar': 0,
+                \ 'fixed': 1
+                \ })
+
+  if space_below < needed_height
+    let options.line = cur_line - needed_height
+    let options.pos = 'botleft'
+  else
+    let options.line = cur_line + 1
+  endif
+
+  let options.col = screen_col
+  let winid = popup_menu(l:list, options)
 endfunction
-
